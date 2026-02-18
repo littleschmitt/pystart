@@ -1,35 +1,28 @@
-import os
 from groq import Groq
 
+client = Groq(api_key='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')
 
-def main():
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        print("Please set your GROQ_API_KEY environment variable.")
-        return
+while(True):
+    answer = input("What can I do for you? ")
 
-    client = Groq(api_key=api_key)
+    if(answer == "Everything"):
+        print("No, that's a lot of work.")
+        break
+    
+    completion = client.chat.completions.create(
+        model="openai/gpt-oss-120b",
+        messages=[
+          {
+            "role": "user",
+            "content": answer
+          }
+        ],
+        temperature=1,
+        max_completion_tokens=8192,
+        top_p=1,
+        stream=False,
+        stop=None
+    )
 
-    print("Groq Chat CLI. Type 'quit' to exit.\n")
-
-    while True:
-        user_input = input("You: ")
-
-        if user_input.lower() == "quit":
-            print("Goodbye!")
-            break
-
-        response = client.chat.completions.create(
-            model="llama3-8b-8192",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": user_input}
-            ],
-        )
-
-        answer = response.choices[0].message.content
-        print(f"Assistant: {answer}\n")
-
-
-if __name__ == "__main__":
-    main()
+    print(completion.choices[0].message.content)
+    print()
